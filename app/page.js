@@ -30,13 +30,13 @@ const style = {
 
 export default function Home() {
   // We'll add our component logic here
-  const [inventory, setInventory] = useState([])
-  const [open, setOpen] = useState(false)
-  const [itemName, setItemName] = useState('')
+  const [inventory, setInventory] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [itemName, setItemName] = useState('');
 
   const updateInventory = async () => {
-    const snapshot = query(collection(firestore, 'inventory'))
-    const docs = await getDocs(snapshot)
+    const snapshot = query(collection(firestore, 'inventory'));
+    const docs = await getDocs(snapshot);
     const inventoryList = []
     docs.forEach((doc) => {
       inventoryList.push({ name: doc.id, ...doc.data() })
@@ -49,7 +49,8 @@ export default function Home() {
   }, [])
 
   const addItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item)
+    try{
+    const docRef = doc(collection(firestore, "inventory"), item)
     const docSnap = await getDoc(docRef)
     if (docSnap.exists()) {
       const { quantity } = docSnap.data()
@@ -57,18 +58,25 @@ export default function Home() {
     } else {
       await setDoc(docRef, { quantity: 1 })
     }
-    await updateInventory()
-  }
+    await updateInventory();
+  } catch (error) {
+    console.error("Error adding item: ", error);
+    }
+  };
 
   const removeItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item);
+    try{ 
+    const docRef = doc(collection(firestore, "inventory"), item);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       const { quantity } = docSnap.data()
-        await deleteDoc(docRef)
+        await deleteDoc(docRef);
       } 
   
-    await updateInventory();
+      await updateInventory();
+    } catch(error) {
+      console.error("Error removing item: ", error);
+    }
     };
 
   const handleOpen = () => setOpen(true)
