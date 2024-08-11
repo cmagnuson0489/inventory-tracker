@@ -19,7 +19,7 @@ const style = {
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 400,
-  bgcolor: 'white',
+  bgcolor: '#659DBD',
   border: '2px solid #000',
   boxShadow: 24,
   p: 4,
@@ -93,40 +93,56 @@ export default function Home() {
       flexDirection={'column'}
       alignItems={'center'}
       gap={2}
-      bgcolor={'#99d1e1'}  // Pastel background color
+      bgcolor={'#659DBD'}  // Pastel background color
     >
       <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+>
+  <Box 
+    sx={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: 400,
+      bgcolor: 'white',  // Set the background color to white (or any color you prefer)
+      border: '2px solid #000',
+      boxShadow: 24,
+      p: 4,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 3,
+    }}
+  >
+    <Typography id="modal-modal-title" variant="h6" component="h2">
+      Add Item
+    </Typography>
+    <Stack width="100%" direction={'row'} spacing={2}>
+      <TextField
+        id="outlined-basic"
+        label="Item"
+        variant="outlined"
+        fullWidth
+        value={itemName}
+        onChange={(e) => setItemName(e.target.value)}
+      />
+      <Button
+        variant="outlined"
+        onClick={() => {
+          addItem(itemName);
+          setItemName('');
+          handleClose();
+        }}
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Add Item
-          </Typography>
-          <Stack width="100%" direction={'row'} spacing={2}>
-            <TextField
-              id="outlined-basic"
-              label="Item"
-              variant="outlined"
-              fullWidth
-              value={itemName}
-              onChange={(e) => setItemName(e.target.value)}
-            />
-            <Button
-              variant="outlined"
-              onClick={() => {
-                addItem(itemName)
-                setItemName('')
-                handleClose()
-              }}
-            >
-              Add
-            </Button>
-          </Stack>
-        </Box>
-      </Modal>
+        Add
+      </Button>
+    </Stack>
+  </Box>
+</Modal>
+
 
       <Button variant="contained" onClick={handleOpen}>
         Add New Item
@@ -149,7 +165,7 @@ export default function Home() {
   <Box
     width="1000px"  // Updated width
     height="100px"
-    bgcolor={'#d9dad9'}  // Light blue header background
+    bgcolor={'#EE8B67'}  // Light blue header background
     display={'flex'}
     justifyContent={'center'}
     alignItems={'center'}
@@ -172,7 +188,7 @@ export default function Home() {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
-      bgcolor="#f0f0f0"
+      bgcolor="#EC776A"
       paddingX={1}
       sx={{ borderBottom: '1px solid #ccc' }}
     >
