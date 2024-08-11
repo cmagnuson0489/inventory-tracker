@@ -29,10 +29,10 @@ const style = {
 }
 
 export default function Home() {
-  // We'll add our component logic here
   const [inventory, setInventory] = useState([]);
   const [open, setOpen] = useState(false);
   const [itemName, setItemName] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'inventory'));
@@ -49,38 +49,40 @@ export default function Home() {
   }, [])
 
   const addItem = async (item) => {
-    try{
-    const docRef = doc(collection(firestore, "inventory"), item)
-    const docSnap = await getDoc(docRef)
-    if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
-      await setDoc(docRef, { quantity: quantity + 1 })
-    } else {
-      await setDoc(docRef, { quantity: 1 })
-    }
-    await updateInventory();
-  } catch (error) {
-    console.error("Error adding item: ", error);
+    try {
+      const docRef = doc(collection(firestore, "inventory"), item)
+      const docSnap = await getDoc(docRef)
+      if (docSnap.exists()) {
+        const { quantity } = docSnap.data()
+        await setDoc(docRef, { quantity: quantity + 1 })
+      } else {
+        await setDoc(docRef, { quantity: 1 })
+      }
+      await updateInventory();
+    } catch (error) {
+      console.error("Error adding item: ", error);
     }
   };
 
   const removeItem = async (item) => {
-    try{ 
-    const docRef = doc(collection(firestore, "inventory"), item);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
+    try { 
+      const docRef = doc(collection(firestore, "inventory"), item);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
         await deleteDoc(docRef);
       } 
-  
       await updateInventory();
     } catch(error) {
       console.error("Error removing item: ", error);
     }
-    };
+  };
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
+
+  const filteredInventory = inventory.filter(item =>
+    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Box
@@ -91,6 +93,7 @@ export default function Home() {
       flexDirection={'column'}
       alignItems={'center'}
       gap={2}
+      bgcolor={'#99d1e1'}  // Pastel background color
     >
       <Modal
         open={open}
@@ -124,47 +127,68 @@ export default function Home() {
           </Stack>
         </Box>
       </Modal>
+
       <Button variant="contained" onClick={handleOpen}>
         Add New Item
       </Button>
-      <Box border={'1px solid #333'}>
-        <Box
-          width="800px"
-          height="100px"
-          bgcolor={'#ADD8E6'}
-          display={'flex'}
-          justifyContent={'center'}
-          alignItems={'center'}
-        >
-          <Typography variant={'h2'} color={'#333'} textAlign={'center'}>
-            Inventory Items
-          </Typography>
-        </Box>
-        <Stack width="800px" height="300px" spacing={2} overflow={'auto'}>
-          {inventory.map(({name, quantity}) => (
-            <Box
-              key={name}
-              width="100%"
-              minHeight="150px"
-              display={'flex'}
-              justifyContent={'space-between'}
-              alignItems={'center'}
-              bgcolor={'#f0f0f0'}
-              paddingX={5}
-            >
-              <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
-                {name.charAt(0).toUpperCase() + name.slice(1)}
-              </Typography>
-              <Typography variant={'h3'} color={'#333'} textAlign={'center'}>
-                Quantity: {quantity}
-              </Typography>
-              <Button variant="contained" onClick={() => removeItem(name)}>
-                Remove
-              </Button>
-            </Box>
-          ))}
-        </Stack>
-      </Box>
+
+      <TextField
+        label="Search Items"
+        variant="outlined"
+        fullWidth
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        sx={{ 
+          width: '1000px', 
+          marginBottom: 2, 
+          bgcolor: 'white'  // Set the background color to white
+        }}
+      />
+
+<Box border={'1px solid #333'}>
+  <Box
+    width="1000px"  // Updated width
+    height="100px"
+    bgcolor={'#d9dad9'}  // Light blue header background
+    display={'flex'}
+    justifyContent={'center'}
+    alignItems={'center'}
+  >
+    <Typography variant={'h2'} color={'#333'} textAlign={'center'}>
+      Inventory Items
+    </Typography>
+  </Box>
+   <Stack
+  width="1000px"
+  overflow="auto"
+  spacing={0}
+  sx={{ padding: 0, height: 'auto', maxHeight: '300px' }} // Dynamic height with a max limit
+>
+  {filteredInventory.map(({ name, quantity }) => (
+    <Box
+      key={name}
+      width="100%"
+      minHeight="80px"
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      bgcolor="#f0f0f0"
+      paddingX={1}
+      sx={{ borderBottom: '1px solid #ccc' }}
+    >
+      <Typography variant="body1" color="#333" textAlign="left" sx={{ flex: 1, marginRight: 1 }}>
+        {name.charAt(0).toUpperCase() + name.slice(1)}
+      </Typography>
+      <Typography variant="body1" color="#333" textAlign="center" sx={{ flex: 1, marginRight: 1 }}>
+        Quantity: {quantity}
+      </Typography>
+      <Button variant="contained" onClick={() => removeItem(name)} sx={{ minWidth: '70px', flexShrink: 0 }}>
+        Remove
+      </Button>
     </Box>
-  );
+  ))}
+</Stack>
+ </Box>
+</Box>
+);
 }
